@@ -13,8 +13,9 @@ from utils.lr_scheduler import LR_Scheduler
 from utils.saver import Saver
 from utils.summaries import TensorboardSummary
 from utils.metrics import Evaluator
-
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+import torch.multiprocessing
+torch.multiprocessing.set_sharing_strategy('file_system')
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 class Trainer(object):
     def __init__(self, args):
@@ -29,7 +30,7 @@ class Trainer(object):
         
         # Define Dataloader
         kwargs = {'num_workers': args.workers, 'pin_memory': True}
-        self.train_loader, self.val_loader, self.test_loader, self.nclass = make_data_loader(args, **kwargs)
+        self.train_loader, self.val_loader, self.nclass = make_data_loader(args, **kwargs)
 
         # Define network
         model = CoANet(num_classes=self.nclass,
@@ -259,7 +260,7 @@ def main():
     parser.add_argument('--dataset', type=str, default='spacenet',
                         choices=['spacenet', 'DeepGlobe'],
                         help='dataset name (default: spacenet)')
-    parser.add_argument('--workers', type=int, default=16,
+    parser.add_argument('--workers', type=int, default=8,
                         metavar='N', help='dataloader threads')
     parser.add_argument('--base-size', type=int, default=512,
                         help='base image size')
@@ -273,11 +274,11 @@ def main():
                         choices=['ce', 'con_ce', 'focal'],
                         help='loss func type')
     # training hyper params
-    parser.add_argument('--epochs', type=int, default=150, metavar='N',
+    parser.add_argument('--epochs', type=int, default=30, metavar='N',#150
                         help='number of epochs to train')
     parser.add_argument('--start_epoch', type=int, default=0,
                         metavar='N', help='start epochs (default:0)')
-    parser.add_argument('--batch-size', type=int, default=16,
+    parser.add_argument('--batch-size', type=int, default=10,
                         metavar='N', help='input batch size for \
                                 training (default: 16)')
     parser.add_argument('--use-balanced-weights', action='store_true', default=False,
@@ -297,7 +298,7 @@ def main():
     # cuda, seed and logging
     parser.add_argument('--no-cuda', action='store_true', default=
                         False, help='disables CUDA training')
-    parser.add_argument('--gpu-ids', type=str, default='0,1,2,3',
+    parser.add_argument('--gpu-ids', type=str, default='0',
                         help='use which gpu to train, must be a \
                         comma-separated list of integers only (default=0,1,2,3)')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
@@ -339,4 +340,4 @@ def main():
     trainer.writer.close()
 
 if __name__ == "__main__":
-   main()
+   main()#31264

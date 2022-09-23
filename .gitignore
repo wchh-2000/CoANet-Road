@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.DS_Store
+
+# mypy
+.mypy_cache/
+
+.vscode
+.idea
+
+# custom
+*.pkl
+*.pkl.json
+*.log.json
+run/
+mmseg/.mim
+*.npy
+loss*.png
+acc*.png
+lr*.png
+results
+*.zip
+*.out
+# Pytorch
+*.pth

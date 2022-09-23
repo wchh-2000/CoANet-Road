@@ -3,7 +3,7 @@ import argparse
 import cv2
 import os, time
 from tqdm import tqdm
-
+import mmcv
 def direction_process_d1(imgpath, savedir):
     if not os.path.exists(savedir):
         os.mkdir(savedir)
@@ -68,29 +68,25 @@ def direction_process_d3(imgpath, savedir):
     cv2.imwrite(os.path.join(savedir, imgpath.split('/')[-1].split('.')[0] + '_2' + '.png'), dir_array2 * 255)
 
 
-def batch_process(imgdir, savedir_d1, savedir_d3):
-    for i in tqdm(os.listdir(imgdir)):
-        if i.split('.')[-1] != 'png':
-            # print('continue..')
-            continue
-        direction_process_d1(os.path.join(imgdir, i), savedir_d1)
-        direction_process_d3(os.path.join(imgdir, i), savedir_d3)
+def process(imgname):
+    imgdir="/data/chusai_release/road/gt"
+    savedir_d1='/data/chusai_release/road/connect_8_d1'
+    savedir_d3='/data/chusai_release/road/connect_8_d3'
+    direction_process_d1(os.path.join(imgdir, imgname), savedir_d1)
+    direction_process_d3(os.path.join(imgdir, imgname), savedir_d3)
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--base_dir', type=str, default='../../data/SpaceNet/spacenet/result_3m/crops',
+    parser.add_argument('-d', '--base_dir', type=str, default='/data/chusai_release/road',
         help='Base directory for Spacenent Dataset.')
     args = parser.parse_args()
 
-    gt_path = os.path.join(args.base_dir, 'gt')
-    connect_d1_path = os.path.join(args.base_dir, 'connect_8_d1')
-    connect_d3_path = os.path.join(args.base_dir, 'connect_8_d3')
+    gt_path = os.path.join(args.base_dir, 'gt')#ground truth
 
-    start = time.clock()
+    start = time.time()
     ##  connectivity cube
-    batch_process(gt_path, connect_d1_path, connect_d3_path)
-
-    end = time.clock()
+    _ = mmcv.track_parallel_progress(process, os.listdir(gt_path), 16)
+    end = time.time()
     print('Finished Creating connectivity cube, time {0}s'.format(end - start))
 
 if __name__ == "__main__":
